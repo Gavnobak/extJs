@@ -3,20 +3,32 @@ Ext.define('ModernApp.view.personnel.PersonnelViewController', {
     alias: 'controller.personnelviewcontroller',
 
     onSelectionChange: function(selectable, records, selecting, selection) {
-        var button = this.lookup('folderButton'),
+        var buttonFol = this.lookup('folderButton'),
+            buttonFil = this.lookup('fileButton'),
+            buttonLin = this.lookup('linkButton'),
+            buttonPro = this.lookup('propertyButton'),
             vm = this.getView().getViewModel(),
             selectedNode;
 
 
         if (selection.getCount()) {
             selectedNode = records[0];
+            buttonPro.enable()
             vm.set('selectedRow', selectedNode.data.property)
-           // console.log(vm.get('selectedRow'))
             if (selectedNode.data.leaf){
-                button.disable()
+                buttonFol.disable()
+                buttonFil.disable()
+                buttonLin.disable()
             } else{
-                button.enable()
+                buttonFol.enable()
+                buttonFil.enable()
+                buttonLin.enable()
             }
+        }else {
+            buttonFol.disable()
+            buttonFil.disable()
+            buttonLin.disable()
+            buttonPro.disable()
         }
     },
     addFolder: function() {
@@ -60,6 +72,28 @@ Ext.define('ModernApp.view.personnel.PersonnelViewController', {
             inputField.reset();
         }
     },
+    addLink: function() {
+        var tree = this.getView(),
+            store = tree.getStore(),
+            target = tree.getSelections()[0] || store.getRoot(),
+            inputField = this.lookup('folderName'),
+            value = inputField.getValue(),
+            node;
+
+        if (value) {
+            node = {
+                text: "link",
+                leaf: true,
+                property: [],
+                iconCls: 'x-fa fa fa-link',
+                url:value
+            };
+
+            target.appendChild(node);
+
+            inputField.reset();
+        }
+    },
     addProp: function() {
         var tree = this.getView(),
             vm = tree.getViewModel(),
@@ -76,6 +110,7 @@ Ext.define('ModernApp.view.personnel.PersonnelViewController', {
             // костыль
             row.push(newProp)
             grid.getStore().add(newProp)
+            // grid.getStore().sync()
         }
-    }
+    },
 });
