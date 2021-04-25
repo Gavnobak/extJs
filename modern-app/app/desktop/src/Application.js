@@ -14,7 +14,7 @@ Ext.define('ModernApp.Application', {
 
 	launch: function () {
 		this.removeSplash()
-		var whichView = 'mainview'
+		var whichView = 'personnelview'
 		Ext.Viewport.add([{xtype: whichView}])
 	},
 
