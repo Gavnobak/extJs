@@ -15,7 +15,8 @@ Ext.define('ModernApp.view.personnel.PersonnelView', {
         desktop: {
             plugins: {
                 gridcellediting: true,
-                treedragdrop: true
+                treedragdrop: true,
+                multiselection: false
             }
         },
 
@@ -61,6 +62,10 @@ Ext.define('ModernApp.view.personnel.PersonnelView', {
             xtype: 'toolbar',
             docked: 'bottom',
             reference: 'tbar',
+            hidden:true,
+            bind: {
+                hidden: '{!selectedNode}'
+            },
             items: [
                 {
                     xtype: 'textfield',
@@ -69,26 +74,34 @@ Ext.define('ModernApp.view.personnel.PersonnelView', {
                 {
                     text: 'Add folder',
                     reference: 'folderButton',
-                    disabled:true,
-                    handler: 'addFolder'
+                    disabled: true,
+                    handler: 'add',
+                    bind: {
+                        disabled: '{selectedNode.leaf}'
+                    },
                 },
                 {
                     text: 'Add file',
                     reference: 'fileButton',
-                    disabled:true,
-                    handler: 'addFile'
+                    disabled: true,
+                    handler: 'add',
+                    bind: {
+                        disabled: '{selectedNode.leaf}'
+                    },
                 },
                 {
                     text: 'Add link',
                     reference: 'linkButton',
-                    disabled:true,
-                    handler: 'addLink'
+                    disabled: true,
+                    handler: 'add',
+                    bind: {
+                        disabled: '{selectedNode.leaf}'
+                    },
                 },
                 {
                     text: 'Add property',
                     reference: 'propertyButton',
-                    disabled:true,
-                    handler: 'addProp'
+                    handler: 'add',
                 },
             ]
         },

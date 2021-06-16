@@ -2,115 +2,63 @@ Ext.define('ModernApp.view.personnel.PersonnelViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.personnelviewcontroller',
 
-    onSelectionChange: function(selectable, records, selecting, selection) {
-        var buttonFol = this.lookup('folderButton'),
-            buttonFil = this.lookup('fileButton'),
-            buttonLin = this.lookup('linkButton'),
-            buttonPro = this.lookup('propertyButton'),
-            vm = this.getView().getViewModel(),
-            selectedNode;
-
-
-        if (selection.getCount()) {
-            selectedNode = records[0];
-            buttonPro.enable()
+    onSelectionChange: function (selectable, records, selecting, selection) {
+        const vm = this.getView().getViewModel();
+        if (selection.getCount() === 1) {
+            const selectedNode = records[0];
+            vm.set('selectedNode', selectedNode.data)
             vm.set('selectedRow', selectedNode.data.property)
-            if (selectedNode.data.leaf){
-                buttonFol.disable()
-                buttonFil.disable()
-                buttonLin.disable()
-            } else{
-                buttonFol.enable()
-                buttonFil.enable()
-                buttonLin.enable()
-            }
-        }else {
-            buttonFol.disable()
-            buttonFil.disable()
-            buttonLin.disable()
-            buttonPro.disable()
+        } else {
+            vm.set('selectedNode', null)
+            vm.set('selectedRow', [])
         }
     },
-    addFolder: function() {
-        var tree = this.getView(),
+
+    add: function (button) {
+        const tree = this.getView(),
             store = tree.getStore(),
             target = tree.getSelections()[0] || store.getRoot(),
             inputField = this.lookup('folderName'),
-            value = inputField.getValue(),
-            node;
-
-        if (value) {
-
-            node = {
-                text: value,
-                children: [],
-                property: [],
-            };
-
-            target.appendChild(node);
-
-            inputField.reset();
-        }
-    },
-    addFile: function() {
-        var tree = this.getView(),
-            store = tree.getStore(),
-            target = tree.getSelections()[0] || store.getRoot(),
-            inputField = this.lookup('folderName'),
-            value = inputField.getValue(),
-            node;
-
-        if (value) {
-          node = {
-                text: value,
-                leaf: true,
-                property: [],
-            };
-
-            target.appendChild(node);
-
-            inputField.reset();
-        }
-    },
-    addLink: function() {
-        var tree = this.getView(),
-            store = tree.getStore(),
-            target = tree.getSelections()[0] || store.getRoot(),
-            inputField = this.lookup('folderName'),
-            value = inputField.getValue(),
-            node;
-
-        if (value) {
-            node = {
-                text: "link",
-                leaf: true,
-                property: [],
-                iconCls: 'x-fa fa fa-link',
-                url:value
-            };
-
-            target.appendChild(node);
-
-            inputField.reset();
-        }
-    },
-    addProp: function() {
-        var tree = this.getView(),
-            vm = tree.getViewModel(),
-            row = vm.get('selectedRow'),
-            inputField = this.lookup('folderName'),
-            grid = this.lookup('propGrid'),
             value = inputField.getValue();
+        let node = {
+            text: value,
+            property: [],
+        };
 
         if (value) {
-            newProp = {
-                name: value,
-                value: '',
-            };
-            // костыль
-            row.push(newProp)
-            grid.getStore().add(newProp)
-            // grid.getStore().sync()
+            switch (button.reference) {
+                case 'folderButton':
+                    node.children = [];
+                    break;
+                case 'fileButton':
+                    node.leaf = true;
+                    break;
+                case 'linkButton':
+                    node.text = "link";
+                    node.leaf = true;
+                    node.iconCls = 'x-fa fa fa-link';
+                    node.url = value;
+                    break;
+                case 'propertyButton':
+                    const row = tree.getViewModel().get('selectedRow'),
+                        grid = this.lookup('propGrid'),
+                        newProp = {
+                            name: value,
+                            value: '',
+                        };
+                    // костыль
+                    row.push(newProp)
+                    grid.getStore().add(newProp)
+                    // grid.getStore().sync()
+                    break;
+                default:
+                    alert("нет такой кнопки");
+            }
+            if (button.reference !== 'propertyButton') {
+                target.appendChild(node);
+            }
+            inputField.reset();
         }
     },
+
 });
